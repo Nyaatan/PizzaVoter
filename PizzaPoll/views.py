@@ -3,6 +3,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
+from django.db.models import F
 
 from .models import Pizza
 from .serializers import PizzaSerializer, StatsSerializer
@@ -44,9 +45,7 @@ class PizzaViewSet(mixins.ListModelMixin,
         except AssertionError:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        pizza = Pizza.objects.get(pk=int(data['id']))
-        pizza.votes = pizza.votes + 1
-        pizza.save()
+        pizza = Pizza.objects.filter(pk=int(data['id'])).update(votes=F('votes')+1)
         return Response(status=status.HTTP_201_CREATED)
 
 
